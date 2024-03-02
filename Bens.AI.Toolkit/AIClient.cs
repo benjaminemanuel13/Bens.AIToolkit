@@ -20,6 +20,15 @@ namespace Bens.AI.Toolkit
         public static string AzureCredentials { get; set; } = string.Empty;
         public static string AzureDeployment { get; set; } = string.Empty;
 
+        public static string AzureVisionUrl { get; set; } = string.Empty;
+        public static string AzureVisionCredentials { get; set; } = string.Empty;
+        public static string AzureVisionDeployment { get; set; } = string.Empty;
+
+
+        public static string AzureEnhancementVisionUrl { get; set; } = string.Empty;
+        public static string AzureEnhancementVisionCredentials { get; set; } = string.Empty;
+
+
         public static string SearchUrl { get; set; } = string.Empty;
         public static string SearchCredentials { get; set; } = string.Empty;
         public static string SearchIndex { get; set; } = string.Empty;
@@ -544,6 +553,177 @@ namespace Bens.AI.Toolkit
             }
 
             return null;
+        }
+
+        // VISION
+
+        public byte[] GetImageBytes(string file)
+        {
+            FileStream stream = File.OpenRead(file);
+            BinaryReader reader = new BinaryReader(stream);
+
+            byte[] data = reader.ReadBytes((int)stream.Length);
+
+            return data;
+        }
+
+        public string GetBase64(byte[] bytes)
+        {
+            string data = Convert.ToBase64String(bytes, 0, bytes.Length, Base64FormattingOptions.None);
+            return data;
+        }
+
+        public async Task<string> SendEnhanced(string question, string image64)
+        {
+            GPTRequestEnhanced request = new GPTRequestEnhanced()
+            {
+                enhancements = new GPTEnhancements()
+                {
+                    ocr = new GPTEnhancement()
+                    {
+                        enabled = true
+                    },
+                    grounding = new GPTEnhancement()
+                    {
+                        enabled = true
+                    },
+                    dataSource = new List<GPTDataSource>() {
+                        new GPTDataSource()
+                        {
+                            type = "AzureComputerVision",
+                            parameters = new GPTDataSourceParameters(){
+                                endpoint = AzureEnhancementVisionUrl,
+                                key = AzureEnhancementVisionCredentials
+                            }
+                        }
+                    }
+                },
+                messages = new List<GPTMessage>
+                {
+                    new GPTMessage
+                    {
+                        role = "system",
+                        contentText = "You are a helpful assistant."
+                    },
+                    new GPTMessage()
+                    {
+                        role = "user",
+                        content = new List<GPTContentBase>
+                        {
+                            new GPTContentBase()
+                            {
+                                type = "text",
+                                text = question
+                            },
+                            new GPTContentFull()
+                            {
+                                type = "image_url",
+                                image_url = new GPTUrl()
+                                {
+                                    url = "data:image/jpeg;base64," + image64
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            string json = JsonConvert.SerializeObject(request);
+
+            json = json.Replace("contentText", "content");
+            json = json.Replace(",\"content\":null", "");
+            json = json.Replace(",\"text\":null", "");
+
+            string cred = AzureVisionCredentials;
+
+            string url = AzureVisionUrl + "/openai/deployments/" + AzureVisionDeployment + "/chat/completions?api-version=2023-12-01-preview";
+
+            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("api-key", cred);
+
+            var res = await client.PostAsync(url, content);
+
+            if (res.IsSuccessStatusCode)
+            {
+                var respjson = await res.Content.ReadAsStringAsync();
+
+                respjson = respjson.Replace("content", "contentText");
+
+                var resp = JsonConvert.DeserializeObject<GPTResponse>(respjson);
+
+                if (resp.choices.Count > 0)
+                    return resp.choices[0].message.contentText;
+            }
+
+            return "error";
+        }
+
+        public async Task<string> Send(string question, string image64)
+        {
+            GPTRequest request = new GPTRequest()
+            {
+                messages = new List<GPTMessage>
+                {
+                    new GPTMessage
+                    {
+                        role = "system",
+                        contentText = "You are a helpful assistant."
+                    },
+                    new GPTMessage()
+                    {
+                        role = "user",
+                        content = new List<GPTContentBase>
+                        {
+                            new GPTContentBase()
+                            {
+                                type = "text",
+                                text = question
+                            },
+                            new GPTContentFull()
+                            {
+                                type = "image_url",
+                                image_url = new GPTUrl()
+                                {
+                                    url = "data:image/jpeg;base64," + image64
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            string json = JsonConvert.SerializeObject(request);
+
+            json = json.Replace("contentText", "content");
+            json = json.Replace(",\"content\":null", "");
+            json = json.Replace(",\"text\":null", "");
+
+            string cred = AzureVisionCredentials;
+
+            string url = AzureVisionUrl + "/openai/deployments/" + AzureVisionDeployment + "/chat/completions?api-version=2023-12-01-preview";
+
+            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("api-key", cred);
+
+            var res = await client.PostAsync(url, content);
+
+            if (res.IsSuccessStatusCode)
+            {
+                var respjson = await res.Content.ReadAsStringAsync();
+
+                respjson = respjson.Replace("content", "contentText");
+
+                var resp = JsonConvert.DeserializeObject<GPTResponse>(respjson);
+
+                if (resp.choices.Count > 0)
+                    return resp.choices[0].message.contentText;
+            }
+
+            return "error";
         }
     }
 }

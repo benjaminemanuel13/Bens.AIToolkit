@@ -7,6 +7,17 @@ AIClient.AzureUrl
 AIClient.AzureCredentials
 AIClient.AzureDeployment
 
+Using Open AI GTP Chat Vision
+=============================
+AIClient.AzureVisionUrl
+AIClient.AzureVisionCredentials
+AIClient.AzureVisionDeployment
+
+Using Open AI GTP Chat Vision (Enhanced)
+========================================
+AIClient.AzureEnhancementVisionUrl
+AIClient.AzureEnhancementVisionCredentials
+
 Using Open AI GTP Chat (Bring Your Own Data)
 ============================================
 AIClient.SearchUrl
