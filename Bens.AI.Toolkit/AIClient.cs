@@ -555,7 +555,7 @@ namespace Bens.AI.Toolkit
             return null;
         }
 
-        // VISION
+            // VISION
 
         public byte[] GetImageBytes(string file)
         {
