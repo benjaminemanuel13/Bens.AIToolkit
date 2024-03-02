@@ -1,8 +1,8 @@
 ﻿
 To use this library you will need the following set before invoking any methods on AIClient.
 
-Using Open AI GTP Chat
-======================
+Using Open AI GTP Chat & Assistant
+==================================
 AIClient.AzureUrl
 AIClient.AzureCredentials
 AIClient.AzureDeployment
