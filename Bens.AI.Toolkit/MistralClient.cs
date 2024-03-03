@@ -51,7 +51,6 @@ namespace Bens.AI.Toolkit
                 var response = JsonConvert.DeserializeObject<MistralResponse>(result);
 
                 return response.choices[0].message.content;
-
             }
 
             return "error";
