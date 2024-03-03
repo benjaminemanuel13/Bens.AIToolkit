@@ -8,4 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Bens.AI.Toolkit\Bens.AI.Toolkit.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,8 @@
 ﻿
-To use this library you will need the following set before invoking any methods on AIClient.
+To use this library you will need the following set 
+before invoking any methods on AIClient.
+
+-----------------------------------------------------
 
 Using Open AI GTP Chat & Assistant
 ==================================
@@ -28,3 +31,12 @@ OCR In File Uploads
 ===================
 AIClient.CognitiveEndpoint
 AIClient.CognitiveKey
+
+-----------------------------------------------------
+
+For Mistral
+===========
+MistralClient.MistralUrl
+MistralClient.MistralCredentials
+
+-----------------------------------------------------
